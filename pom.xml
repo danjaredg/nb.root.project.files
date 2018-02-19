@@ -86,6 +86,7 @@
 					<author>Jared González</author>
 					<licenseFile>${basedir}/LICENSE.md</licenseFile>
 					<licenseName>MIT License</licenseName>
+					<requiresRestart>true</requiresRestart>
 				</configuration>
 			</plugin>
 			<plugin>
