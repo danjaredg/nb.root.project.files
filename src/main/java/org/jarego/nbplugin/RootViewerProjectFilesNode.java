@@ -139,8 +139,8 @@ public class RootViewerProjectFilesNode extends AbstractNode {
 			// registra archivos de configuración de netbeans
 			List<FileObject> nbfiles = new ArrayList<>();
 			for (FileObject kid : d.getChildren()) {
-				if (!kid.isFolder() && !"pom.xml".equals(kid.getNameExt()) &&
-						kid.getNameExt().startsWith("nb") && kid.getNameExt().endsWith(".xml"))
+				if (!kid.isFolder() && !kid.getNameExt().startsWith(".") && !"pom.xml".equals(kid.getNameExt())
+						&& kid.getNameExt().startsWith("nb") && kid.getNameExt().endsWith(".xml"))
 					nbfiles.add(kid);
 			}
 			Collections.sort(nbfiles, fileObjectComparator);
@@ -149,8 +149,8 @@ public class RootViewerProjectFilesNode extends AbstractNode {
 			// registrando otros archivos
 			nbfiles.clear();
 			for (FileObject kid : d.getChildren()) {
-				if (!kid.isFolder() && !"pom.xml".equals(kid.getNameExt()) &&
-						!(kid.getNameExt().startsWith("nb") && kid.getNameExt().endsWith(".xml")))
+				if (!kid.isFolder() && !kid.getNameExt().startsWith(".") && !"pom.xml".equals(kid.getNameExt())
+						&& !(kid.getNameExt().startsWith("nb") && kid.getNameExt().endsWith(".xml")))
 					nbfiles.add(kid);
 			}
 			Collections.sort(nbfiles, fileObjectComparator);
