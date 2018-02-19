@@ -2,6 +2,8 @@ package org.jarego.nbplugin;
 
 import java.awt.Image;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.Icon;
 import javax.swing.UIManager;
@@ -88,6 +90,7 @@ public class RootViewerProjectFilesNode extends AbstractNode {
 	private static class ProjectFileChildren extends ChildFactory.Detachable<FileObject> {
 		private final Project project;
 		private final FileChangeAdapter fileChangeListener;
+		private final Comparator<FileObject> fileObjectComparator;
 
 		public ProjectFileChildren(Project project) {
 			this.project = project;
@@ -99,6 +102,12 @@ public class RootViewerProjectFilesNode extends AbstractNode {
 				@Override
 				public void fileDeleted(FileEvent fe) {
 					refresh(false);
+				}
+			};
+			fileObjectComparator = new Comparator<FileObject>() {			
+				@Override
+				public int compare(FileObject o1, FileObject o2) {
+					return o1.getNameExt().compareTo(o2.getNameExt());
 				}
 			};
 		}
@@ -124,19 +133,28 @@ public class RootViewerProjectFilesNode extends AbstractNode {
 		@Override
 		protected boolean createKeys(List<FileObject> toPopulate) {
 			FileObject d = project.getProjectDirectory();
+			// registra archivo pom.xml
 			toPopulate.add(d.getFileObject("pom.xml"));
+			
+			// registra archivos de configuración de netbeans
 			List<FileObject> nbfiles = new ArrayList<>();
 			for (FileObject kid : d.getChildren()) {
 				if (!kid.isFolder() && !"pom.xml".equals(kid.getNameExt()) &&
 						kid.getNameExt().startsWith("nb") && kid.getNameExt().endsWith(".xml"))
 					nbfiles.add(kid);
 			}
+			Collections.sort(nbfiles, fileObjectComparator);
 			toPopulate.addAll(nbfiles);
+			
+			// registrando otros archivos
+			nbfiles.clear();
 			for (FileObject kid : d.getChildren()) {
 				if (!kid.isFolder() && !"pom.xml".equals(kid.getNameExt()) &&
 						!(kid.getNameExt().startsWith("nb") && kid.getNameExt().endsWith(".xml")))
-					toPopulate.add(kid);
+					nbfiles.add(kid);
 			}
+			Collections.sort(nbfiles, fileObjectComparator);
+			toPopulate.addAll(nbfiles);
 			return true;
 		}
 	}
