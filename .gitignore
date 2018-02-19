@@ -1,0 +1,10 @@
+/target/
+
+/nb*.xml
+
+/.settings/
+/.metadata/
+/.project
+/.classpath
+
+/.directory
