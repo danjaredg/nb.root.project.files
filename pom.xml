@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<groupId>org.jarego</groupId>
-	<artifactId>nb.root.maven.files</artifactId>
+	<artifactId>nb.root.project.files</artifactId>
 	<version>1.1</version>
 	<packaging>nbm</packaging>
 	
-	<name>Root Maven Files</name>
-	<description>Show files in root project folder for maven projects in project view</description>
+	<name>Root Project Files</name>
+	<description>Show files from root project folder in project view</description>
 	
 	<developers>
 		<developer>
