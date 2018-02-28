@@ -1,4 +1,4 @@
-package org.jarego.nbplugin;
+package org.jarego.nbplugin.rootprojectfiles;
 
 import org.netbeans.api.project.Project;
 import org.netbeans.spi.project.ui.support.NodeFactory;
