@@ -2,6 +2,7 @@ package org.jarego.nbplugin;
 
 import java.awt.Image;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -20,6 +21,9 @@ import org.openide.nodes.Node;
 import org.openide.util.ImageUtilities;
 
 public class RootViewerProjectFilesNode extends AbstractNode {
+	private static final List<String> IMPORTANT_FILES = Arrays.asList(
+			"pom\\.xml", "nb.+\\.xml", "build\\.xml", "build\\.properties", "manifest\\.mf");
+	
 	public RootViewerProjectFilesNode(Project project) {
 		super(Children.create(new ProjectFileChildren(project), true));
 	}
@@ -130,17 +134,21 @@ public class RootViewerProjectFilesNode extends AbstractNode {
 			project.getProjectDirectory().removeFileChangeListener(fileChangeListener);
 		}
 		
+		protected boolean isImportantFile(FileObject fileObject) {
+			for (String f : IMPORTANT_FILES)
+				if (fileObject.getNameExt().matches(f))
+					return true;
+			return false;
+		}
+		
 		@Override
 		protected boolean createKeys(List<FileObject> toPopulate) {
 			FileObject d = project.getProjectDirectory();
-			// registra archivo pom.xml
-			toPopulate.add(d.getFileObject("pom.xml"));
 			
 			// registra archivos de configuración de netbeans
 			List<FileObject> nbfiles = new ArrayList<>();
 			for (FileObject kid : d.getChildren()) {
-				if (!kid.isFolder() && !kid.getNameExt().startsWith(".") && !"pom.xml".equals(kid.getNameExt())
-						&& kid.getNameExt().startsWith("nb") && kid.getNameExt().endsWith(".xml"))
+				if (!kid.isFolder() && isImportantFile(kid))
 					nbfiles.add(kid);
 			}
 			Collections.sort(nbfiles, fileObjectComparator);
@@ -149,8 +157,7 @@ public class RootViewerProjectFilesNode extends AbstractNode {
 			// registrando otros archivos
 			nbfiles.clear();
 			for (FileObject kid : d.getChildren()) {
-				if (!kid.isFolder() && !kid.getNameExt().startsWith(".") && !"pom.xml".equals(kid.getNameExt())
-						&& !(kid.getNameExt().startsWith("nb") && kid.getNameExt().endsWith(".xml")))
+				if (!kid.isFolder() && !isImportantFile(kid))
 					nbfiles.add(kid);
 			}
 			Collections.sort(nbfiles, fileObjectComparator);
