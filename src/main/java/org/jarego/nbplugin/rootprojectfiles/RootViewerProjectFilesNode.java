@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import javax.swing.Icon;
 import javax.swing.UIManager;
 import org.netbeans.api.project.Project;
@@ -22,7 +25,9 @@ import org.openide.util.ImageUtilities;
 
 public class RootViewerProjectFilesNode extends AbstractNode {
 	private static final List<String> IMPORTANT_FILES = Arrays.asList(
-			"pom\\.xml", "nb.+\\.xml", "build\\.xml", "build\\.properties", "manifest\\.mf");
+			"pom\\.xml", "pom\\.properties", "nb.+\\.xml", // Archivos importantes de Proyecto Mave
+			"build\\.xml", "build\\.properties", "manifest\\.mf" // java pr
+	);
 	
 	public RootViewerProjectFilesNode(Project project) {
 		super(Children.create(new ProjectFileChildren(project), true));
@@ -134,11 +139,14 @@ public class RootViewerProjectFilesNode extends AbstractNode {
 			project.getProjectDirectory().removeFileChangeListener(fileChangeListener);
 		}
 		
-		protected boolean isImportantFile(FileObject fileObject) {
-			for (String f : IMPORTANT_FILES)
+		protected int indexImportantFile(FileObject fileObject) {
+			int i=0;
+			for (String f : IMPORTANT_FILES) {
 				if (fileObject.getNameExt().matches(f))
-					return true;
-			return false;
+					return i;
+				i++;
+			}
+			return -1;
 		}
 		
 		@Override
@@ -146,18 +154,18 @@ public class RootViewerProjectFilesNode extends AbstractNode {
 			FileObject d = project.getProjectDirectory();
 			
 			// registra archivos de configuración de netbeans
-			List<FileObject> nbfiles = new ArrayList<>();
+			Map<Integer, FileObject> nbmapfiles = new TreeMap<>();
+			int index;
 			for (FileObject kid : d.getChildren()) {
-				if (!kid.isFolder() && isImportantFile(kid) && !kid.getNameExt().startsWith("."))
-					nbfiles.add(kid);
+				if (!kid.isFolder() && (index = indexImportantFile(kid)) >= 0 && !kid.getNameExt().startsWith("."))
+					nbmapfiles.put(index, kid);
 			}
-			Collections.sort(nbfiles, fileObjectComparator);
-			toPopulate.addAll(nbfiles);
+			toPopulate.addAll(nbmapfiles.values());
 			
 			// registrando otros archivos
-			nbfiles.clear();
+			ArrayList<FileObject> nbfiles = new ArrayList<>();
 			for (FileObject kid : d.getChildren()) {
-				if (!kid.isFolder() && !isImportantFile(kid) && !kid.getNameExt().startsWith("."))
+				if (!kid.isFolder() && indexImportantFile(kid) < 0 && !kid.getNameExt().startsWith("."))
 					nbfiles.add(kid);
 			}
 			Collections.sort(nbfiles, fileObjectComparator);
