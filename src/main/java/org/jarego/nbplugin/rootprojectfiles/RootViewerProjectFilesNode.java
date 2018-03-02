@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -25,8 +24,10 @@ import org.openide.util.ImageUtilities;
 
 public class RootViewerProjectFilesNode extends AbstractNode {
 	private static final List<String> IMPORTANT_FILES = Arrays.asList(
-			"pom\\.xml", "pom\\.properties", "nb.+\\.xml", // Archivos importantes de Proyecto Mave
-			"build\\.xml", "build\\.properties", "manifest\\.mf" // java pr
+			// Archivos importantes de proyectos Maven
+			"pom.xml", "pom.properties", "nbactions.xml", "nb-configuration.xml",
+			// Archivos importantes de proyectos Java (Netbeans)
+			"build.xml", "build.properties", "manifest.mf"
 	);
 	
 	public RootViewerProjectFilesNode(Project project) {
@@ -142,7 +143,7 @@ public class RootViewerProjectFilesNode extends AbstractNode {
 		protected int indexImportantFile(FileObject fileObject) {
 			int i=0;
 			for (String f : IMPORTANT_FILES) {
-				if (fileObject.getNameExt().matches(f))
+				if (f.equals(fileObject.getNameExt()))
 					return i;
 				i++;
 			}
